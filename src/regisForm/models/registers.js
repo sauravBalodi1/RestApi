@@ -1,4 +1,5 @@
 const mongoose=require("mongoose")
+const bcrypt=require("bcryptjs")
 const employeSchema=new mongoose.Schema({
     firstname:{
         type:String,
@@ -15,13 +16,13 @@ const employeSchema=new mongoose.Schema({
     },
     email:{
         type:String,
-        unique:true,
+        
         required:true
 
     },
     phone:{
         type:Number,
-        unique:true,
+      
         required:true
 
     },
@@ -52,6 +53,21 @@ const employeSchema=new mongoose.Schema({
 
 
 
+
+})
+//we will use here a middleware
+//two types of middleware-pre and post, both will take two arguments the second argument is the FUNCTION
+employeSchema.pre("save",async function(next){
+   // const hash=await bcrypt.hash(password,10) 
+   if(this.isModified("password"))
+   {
+    //const hash=await bcrypt.hash(password,10)
+    console.log(`the current password is : ${this.password}`)
+      this.password=await bcrypt.hash("password",10)
+      console.log(`the current password is : ${this.password}`)
+     confirmPassword=undefined
+    }
+    next()
 
 })
 
