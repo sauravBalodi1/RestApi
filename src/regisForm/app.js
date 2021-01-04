@@ -51,9 +51,13 @@ app.post("/register.hbs",async(req,res)=>{
                     confirmPassword:req.body.password_confirmation
                 })
 //we have to hash the password before it gets save in our database
-        
+        //i will use jws here
+        console.log("the success part : "+registerEmployee)
+        const token=await registerEmployee.generateAuthToken()
+        console.log("the token part is: "+token)
                  
                  const registered=await registerEmployee.save()
+                 console.log("the page part is: "+registered)
                   res.status(201).render("index")
                 }
                else{

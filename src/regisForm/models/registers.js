@@ -1,5 +1,6 @@
 const mongoose=require("mongoose")
 const bcrypt=require("bcryptjs")
+const jwt=require("jsonwebtoken")
 const employeSchema=new mongoose.Schema({
     firstname:{
         type:String,
@@ -50,11 +51,34 @@ const employeSchema=new mongoose.Schema({
         required:true
 
     },
+    tokens:[{
+        token:{
+            type:String,
+            required:true
+        }
+    }] 
 
 
 
 
 })
+//one more middleware for jwt
+
+employeSchema.methods.generateAuthToken=async function(){
+    try{
+        //console.log("check :"+this._id)
+          const token= jwt.sign({_id:this._id.toString()},"mynameissauravbalodifromchandiga")
+          this.tokens=this.tokens.concat({token:token})
+          await this.save()
+          
+          return token
+    }
+    catch(e)
+    {
+    res.send("the error is: "+error)
+    console.log("the errror is : "+e)
+    }
+}
 //we will use here a middleware
 //two types of middleware-pre and post, both will take two arguments the second argument is the FUNCTION
 employeSchema.pre("save",async function(next){
@@ -62,10 +86,11 @@ employeSchema.pre("save",async function(next){
    if(this.isModified("password"))
    {
     //const hash=await bcrypt.hash(password,10)
-    console.log(`the current password is : ${this.password}`)
-      this.password=await bcrypt.hash("password",10)
-      console.log(`the current password is : ${this.password}`)
-     confirmPassword=undefined
+    //console.log(`the current password is : ${this.password}`)
+      this.password=await bcrypt.hash(this.password,10)
+      this.confirmPassword=await bcrypt.hash(this.password,10)
+     // console.log(`the current password is : ${this.password}`)
+     //confirmPassword=undefined
     }
     next()
 
