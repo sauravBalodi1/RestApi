@@ -77,8 +77,11 @@ app.post("/login.hbs",async(req,res)=>{
        console.log(password)
        const userEmail=await Register.findOne({email:email})
        const isMatch= await bcrypt.compare(password,userEmail.password)
+       const token=await userEmail.generateAuthToken()
+       console.log("the token part is: "+token)
          if(isMatch)
          {
+
              res.status(201).render("index")
          }
          else
